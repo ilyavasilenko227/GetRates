@@ -1,0 +1,26 @@
+//protoc --go_out=. --go-grpc_out=. getRates.proto
+syntax = "proto3";
+
+package pbPackage;
+
+option go_package = "./";
+
+service GetRateser{
+    rpc GetRates(RatesRequest) returns (RatesResponse){}
+}
+
+message Order {
+    string price = 1;
+    string volume = 2;
+    string amount = 3;
+    string factor = 4;
+    string type = 5;
+}
+
+message RatesRequest{}
+
+message RatesResponse{
+    Order ask = 1;
+    Order bid =2;
+    int64 timestamp = 3;
+}

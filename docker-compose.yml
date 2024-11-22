@@ -1,0 +1,72 @@
+services:
+
+  rates:
+    build: 
+      dockerfile: Dockerfile 
+    env_file: .env
+    command: /main
+    networks:
+      - go-rates-network
+    depends_on:
+      db:
+       condition: service_healthy
+    ports:
+      - "8080:8080"
+    working_dir: /app
+    volumes:
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
+
+  db: 
+    container_name: ${POSTGRES_DB}
+    image: postgres:latest
+    env_file: .env
+    networks:
+      go-rates-network:
+       aliases:
+          - ${APP_HOST}_db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 3s
+      timeout: 5s
+      retries: 5
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+
+  collector:
+    container_name: go-rates-collector
+    image: otel/opentelemetry-collector:0.107.0
+    volumes:
+      - ./otelcol.yaml:/etc/otelcol/config.yaml
+    depends_on:
+      jaeger:
+        condition: service_healthy
+    networks:
+      - go-rates-network
+    ports:
+      - "4318:4318"
+
+  jaeger:
+    container_name: go-rates-jaeger
+    image: jaegertracing/all-in-one:latest
+    environment:
+      JAEGER_PROPAGATION: w3c
+    ports:
+      - 16686:16686
+    healthcheck:
+      test: [CMD, wget, -q, -S, -O, "-", "localhost:14269"]
+    networks:
+      - go-rates-network
+  
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+    - go-rates-network
+    ports: 
+    - "9090:9090"
+
+networks:
+  go-rates-network:
+  
