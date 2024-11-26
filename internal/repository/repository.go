@@ -3,9 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
-	"flag"
 	"fmt"
-	"os"
 	"rates/internal/entity"
 	"rates/internal/infrastructure/metrics"
 	"rates/pkg/logger"
@@ -17,16 +15,9 @@ var (
 	log = logger.Logger().Named("repository").Sugar()
 )
 
-func NewPostgresClient() (*sql.DB, error) {
-	dbHost := flag.String("host", os.Getenv("POSTGRES_HOST"), "Postgres host")
-	dbPort := flag.String("port", os.Getenv("POSTGRES_PORT"), "Postgres port")
-	dbUser := flag.String("user", os.Getenv("POSTGRES_USER"), "Postgres user")
-	dbName := flag.String("dbname", os.Getenv("POSTGRES_DB"), "Postgres database name")
-	dbPassword := flag.String("password", os.Getenv("POSTGRES_PASSWORD"), "Postgres password")
-	flag.Parse()
-
+func NewPostgresClient(dbHost, dbPort, dbUser, dbPassword, dbName string) (*sql.DB, error) {
 	dns := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-		*dbHost, *dbPort, *dbUser, *dbPassword, *dbName)
+		dbHost, dbPort, dbUser, dbPassword, dbName)
 
 	db, err := sql.Open("postgres", dns)
 

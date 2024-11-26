@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"rates/cmd/config"
 	"rates/internal/controller"
 	"rates/internal/infrastructure/metrics"
 	"rates/internal/infrastructure/optel.go"
@@ -30,12 +31,18 @@ var (
 func main() {
 	var wg sync.WaitGroup
 
-	ctx := context.Background()
+	configs, err := config.ReadConfig()
+	if err != nil {
+		panic(err)
+	}
 
-	logger.BuildLogger("DEBUG")
+	logger.BuildLogger(configs.LogLevel)
 	log = logger.Logger().Named("main").Sugar()
 
-	db, err := repository.NewPostgresClient()
+	ctx := context.Background()
+
+	db, err := repository.NewPostgresClient(configs.DbHost, configs.DbPort, configs.DbUser,
+		configs.DbPassword, configs.DbName)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -48,13 +55,8 @@ func main() {
 	service := service.NewService(repo)
 	contrll := controller.NewController(service)
 	server := server.NewServer(contrll)
-	appHost := os.Getenv("APP_HOST")
-	appPort := os.Getenv("APP_PORT")
-	if appHost == "" || appPort == "" {
-		appHost = "localhost"
-		appPort = "8080"
-	}
-	grpcServer := server.RunApp(appHost, appPort)
+
+	grpcServer := server.RunApp(configs.AppHost, configs.AppPort)
 
 	// Проверка здоровья gRPC сервера
 	healthServer := health.NewServer()
@@ -62,8 +64,7 @@ func main() {
 	healthServer.SetServingStatus("GetRatesUSDT", grpc_health_v1.HealthCheckResponse_SERVING)
 
 	go func() {
-		err := metrics.Listen(fmt.Sprintf("%s:%s",
-			os.Getenv("PROMETHEUS_HOST"), os.Getenv("PROMETHEUS_PORT")))
+		err := metrics.Listen(fmt.Sprintf("%s:%s", configs.PrometheusHost, configs.PrometheusPort))
 		if err != nil {
 			log.Error("error listen metrics: %w", err)
 		}
