@@ -61,7 +61,7 @@ func newTraceProvider(ctx context.Context) (*trace.TracerProvider, error) {
 
 	// Создание провайдера трассировки с указанными параметрами:
 	// - Использование батчевого экспорта (Batcher) для оптимизации отправки данных.
-	// - Добавление ресурса с атрибутами (например, имени сервиса).
+	// - Добавление ресурса с атрибутами (имени сервиса).
 	traceProvider := trace.NewTracerProvider(
 		trace.WithBatcher(traceExporter,
 			// Устанавливаем время ожидания для отправки батчей.

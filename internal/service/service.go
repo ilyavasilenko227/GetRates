@@ -28,7 +28,7 @@ func NewService(rep repository.Repositer) *Service {
 
 func (s Service) GetRates(ctx context.Context) (entity.Depth, error) {
 	log.Debug("Starting GetRates request")
-
+	// Создание трассера для ослеживания времени получения данных от сервиса
 	tracer := otel.Tracer("service.GetRacer")
 	ctx, span := tracer.Start(ctx, "Service")
 	defer span.End()
@@ -82,7 +82,7 @@ func (s Service) GetRates(ctx context.Context) (entity.Depth, error) {
 			Timestamp: data.Timestamp,
 		}
 	}
-	// Метрика наала выполненеия запросов к репозиторию
+	// Метрика начала выполненеия запросов к репозиторию
 	startTotalDB := time.Now()
 	err = s.rep.InsertAsks(ctx, dept)
 	if err != nil {

@@ -25,15 +25,6 @@ func NewPostgresClient() (*sql.DB, error) {
 	dbPassword := flag.String("password", os.Getenv("POSTGRES_PASSWORD"), "Postgres password")
 	flag.Parse()
 
-	// // Проверка, если флаги пустые, берем значения из переменных окружения
-	// if *dbHost == "" || *dbPort == "" || *dbUser == "" || *dbName == "" || *dbPassword == "" {
-	// 	*dbHost = os.Getenv("POSTGRES_HOST")
-	// 	*dbPort = os.Getenv("POSTGRES_PORT")
-	// 	*dbUser = os.Getenv("POSTGRES_USER")
-	// 	*dbName = os.Getenv("POSTGRES_DB")
-	// 	*dbPassword = os.Getenv("POSTGRES_PASSWORD")
-	// }
-
 	dns := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		*dbHost, *dbPort, *dbUser, *dbPassword, *dbName)
 
