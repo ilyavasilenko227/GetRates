@@ -25,9 +25,8 @@ make lint
 make docker-build
 
 ## Приложение можно запустить с использованием Docker. Для этого выполните следующие шаги:
+```bash
 git clone https://github.com/ilyavasilenko227/GetRates
 cd GetRates
 docker compose up -d
 docker compose run --rm rates /main
-
-
