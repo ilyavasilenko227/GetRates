@@ -5,7 +5,9 @@
 
 
 ## Вы можете передать параметры при запуске как в слудующем примере
+```
 go run cmd/main.go -host=localhost -port=5432 -user=postgres -password=secret -dbname=mydb
+```
 
 
 ### Параметры командной строки:
@@ -16,17 +18,24 @@ go run cmd/main.go -host=localhost -port=5432 -user=postgres -password=secret -d
 - `-dbname` — имя базы данных.
 
 ## Запуск тестов
+```
 make test
+```
 
 ## Для проверки кода на соответствие стандартам используйте:
+```
 make lint
+```
 
 ##  Для сборки Docker-образа используйте команду:
+```
 make docker-build
+```
 
 ## Приложение можно запустить с использованием Docker. Для этого выполните следующие шаги:
-```bash
+```
 git clone https://github.com/ilyavasilenko227/GetRates
 cd GetRates
 docker compose up -d
 docker compose run --rm rates /main
+```
